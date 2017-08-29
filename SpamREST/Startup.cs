@@ -8,6 +8,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using SpamREST.ServiceDefinitions;
+using SpamREST.Services;
 
 namespace SpamREST
 {
@@ -24,6 +26,7 @@ namespace SpamREST
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+            services.AddScoped<ISpamRESTRepository, SpamRESTRepositoryInMemory>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
