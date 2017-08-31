@@ -7,139 +7,97 @@ using SpamREST.ServiceDefinitions;
 using SpamREST.Models;
 using Xunit;
 using SpamREST.Services;
+using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace SpamREST.Tests
 {
     public class SpamControllerTests
     {
+        private static IEnumerable<Spam> SpamsList(int count){
+            for(int i = 0; i < count; i++){
+                yield return new Spam(){
+                    EndPointUri = $"https://www.spamREST.com/spam-example{i}",
+                    ReporterId = $"spamrest{i}",
+                    ReporteeId = $"spammer{i}",
+                    Content = $"Spam Content {i}",
+                    Created = DateTime.UtcNow,
+                };
+            }
+        }
+
         [Fact]
-        public void Get_ReturnsSpamsFromRepository(){
+        public async Task Get_ReturnsSpams_FromRepository(){
             var repoMock = new Mock<ISpamRESTRepository>();
             repoMock.Setup(r => r.Spams)
-                .Returns(
-                    new List<Spam>(){
-                        new Spam(){
-                            EndPointUri = "https://www.spamREST.com/spam-example1",
-                            ReporterId = "spamrest",
-                            ReporteeId = "spammer",
-                            Content = "Spam 1 Content",
-                            Created = DateTime.UtcNow,
-                        },
-                        new Spam(){
-                            EndPointUri = "https://www.spamREST.com/spam-example2",
-                            ReporterId = "spamrest",
-                            ReporteeId = "spammer",
-                            Content = "Spam 2 Content",
-                            Created = DateTime.UtcNow,
-                        }
-                    }.AsQueryable()
-                );
+                .Returns(SpamsList(2).AsQueryable());
 
             var controller = new SpamsController(repoMock.Object);
-            var actual = controller.Get();
+            var response = Assert.IsType<OkObjectResult>(await controller.Get());
+            var actual = Assert.IsType<EnumerableQuery<Spam>>(response.Value);
             Assert.Equal(actual.Count(), 2);
         }
 
         [Fact]
-        public void Get_ReturnsSpamById(){
+        public async Task Get_ReturnsSpam_ById(){
             var repoMock = new Mock<ISpamRESTRepository>();
             repoMock.Setup(r => r.Spams)
-                .Returns(
-                    new List<Spam>(){
-                        new Spam(){
-                            EndPointUri = "https://www.spamREST.com/spam-example1",
-                            ReporterId = "spamrest",
-                            ReporteeId = "spammer",
-                            Content = "Spam 1 Content",
-                            Created = DateTime.UtcNow,
-                        },
-                        new Spam(){
-                            EndPointUri = "https://www.spamREST.com/spam-example2",
-                            ReporterId = "spamrest",
-                            ReporteeId = "spammer",
-                            Content = "Spam 2 Content",
-                            Created = DateTime.UtcNow,
-                        }
-                    }.AsQueryable()
-                );
+                .Returns(SpamsList(2).AsQueryable());
 
             var controller = new SpamsController(repoMock.Object);
-            var actual = controller.Get("https://www.spamREST.com/spam-example2");
-            Assert.Equal(actual.Content, "Spam 2 Content");
+            var response = Assert.IsType<OkObjectResult>(await controller.Get("https://www.spamREST.com/spam-example1"));
+            var actual = Assert.IsType<Spam>(response.Value);
+            Assert.Equal(actual.Content, "Spam Content 1");
         }
 
         [Fact]
-        public void Post_AddsNewSpam(){
+        public async Task Post_AddsNewSpam(){
             ISpamRESTRepository repo = new SpamRESTRepositoryInMemory();
             var controller = new SpamsController(repo);
+            var response = Assert.IsType<OkObjectResult>(await controller.Get());
+            var actual = Assert.IsType<EnumerableQuery<Spam>>(response.Value);
+            Assert.Equal(0, actual.Count());
 
-            Assert.Equal(0, controller.Get().Count());
+            await controller.Post(SpamsList(1).First());
 
-            controller.Post(new Spam(){
-                EndPointUri = "https://www.spamREST.com/spam-example1",
-                ReporterId = "spamrest",
-                ReporteeId = "spammer",
-                Content = "Spam 1 Content",
-                Created = DateTime.UtcNow,
-            });
-
-            var spams = controller.Get().Count();
-            Assert.Equal(1, spams);
+            response = Assert.IsType<OkObjectResult>(await controller.Get());
+            actual = Assert.IsType<EnumerableQuery<Spam>>(response.Value);
+            Assert.Equal(1, actual.Count());
         }
 
         [Fact]
-        public void Put_UpsertsSpam(){
+        public async Task Put_UpsertsSpam(){
             ISpamRESTRepository repo = new SpamRESTRepositoryInMemory();
             var controller = new SpamsController(repo);
+            var response = Assert.IsType<OkObjectResult>(await controller.Get());
+            var actual = Assert.IsType<EnumerableQuery<Spam>>(response.Value);
+            Assert.Equal(0, actual.Count());
 
-            Assert.Equal(0, controller.Get().Count());
+            var spamToCreateViaPUT = SpamsList(1).Single();
+            await controller.Put(spamToCreateViaPUT.EndPointUri, spamToCreateViaPUT);
+            response = Assert.IsType<OkObjectResult>(await controller.Get());
+            actual = Assert.IsType<EnumerableQuery<Spam>>(response.Value);
 
-            controller.Put("https://www.spamREST.com/spam-example1", new Spam(){
-                EndPointUri = "https://www.spamREST.com/spam-example1",
-                ReporterId = "spamrest",
-                ReporteeId = "spammer",
-                Content = "Spam 1 Content",
-                Created = DateTime.UtcNow,
-            });
+            Assert.Equal("Spam Content 0", actual.Single().Content);
 
-            var spams = controller.Get();
-            Assert.Equal(1, spams.Count());
+            var spamToUpdateViaPUT = SpamsList(1).Single();
+            spamToUpdateViaPUT.Content = "Spam Modified Content 0";
+            await controller.Put(spamToUpdateViaPUT.EndPointUri, spamToUpdateViaPUT);
 
-            var spam = spams.First();
-            Assert.Equal("Spam 1 Content", spam.Content);
+            response = Assert.IsType<OkObjectResult>(await controller.Get());
+            actual = Assert.IsType<EnumerableQuery<Spam>>(response.Value);
 
-            controller.Put("https://www.spamREST.com/spam-example1", new Spam(){
-                EndPointUri = "https://www.spamREST.com/spam-example1",
-                ReporterId = "spamrest",
-                ReporteeId = "spammer",
-                Content = "Spam 1 Modified Content",
-                Created = DateTime.UtcNow,
-            });
-
-            spams = controller.Get();
-            Assert.Equal(1, spams.Count());
-
-            spam = spams.First();
-            Assert.Equal("Spam 1 Modified Content", spam.Content);
+            Assert.Equal("Spam Modified Content 0", actual.Single().Content);
         }
 
         [Fact]
-        public void Delete_DeletesSpamById(){
+        public async Task Delete_DeletesSpamById(){
             ISpamRESTRepository repo = new SpamRESTRepositoryInMemory();
-            repo.Add(new Spam(){
-                EndPointUri = "https://www.spamREST.com/spam-example1",
-                ReporterId = "spamrest",
-                ReporteeId = "spammer",
-                Content = "Spam 1 Content",
-                Created = DateTime.UtcNow,
-            });
+            repo.Add(SpamsList(1).Single());
 
             var controller = new SpamsController(repo);
-            controller.Delete("https://www.spamREST.com/spam-example1");
-            var spam = repo.Spams
-                .Where(s => s.EndPointUri.Equals("https://www.spamREST.com/spam-example1"))
-                .SingleOrDefault();
-            Assert.Null(spam);
+            var actual = Assert.IsType<NoContentResult>(await controller.Delete("https://www.spamREST.com/spam-example0"));
+            Assert.False(repo.Spams.Any());
         }
     }
 }

@@ -20,47 +20,52 @@ namespace SpamREST.Controllers
 
         // GET api/values
         [HttpGet]
-        public IEnumerable<Spam> Get()
+        public async Task<IActionResult> Get()
         {
-            return repository.Spams.Take(10);
+            return Ok(await Task.FromResult(repository.Spams.Take(10)));
         }
 
         // GET api/values/5
         [HttpGet("{endPointUri}")]
-        public Spam Get(string endPointUri)
+        public async Task<IActionResult> Get(string endPointUri)
         {
-            return repository.Spams
-                .Where(s => s.EndPointUri.Equals(endPointUri))
-                .Single();
+            return Ok(
+                await Task.FromResult(
+                    repository.Spams
+                        .Where(s => s.EndPointUri.Equals(endPointUri))
+                        .Single()));
         }
 
         // POST api/values
         [HttpPost]
-        public void Post([FromBody]Spam spam)
+        public async Task<IActionResult> Post([FromBody]Spam spam)
         {
-            repository.Add(spam);
+            await Task.FromResult(repository.Add(spam));
+            return Created($"/api/spams/{spam.EndPointUri}", spam);
         }
 
         // PUT api/values/5
         [HttpPut("{endPointUri}")]
-        public void Put(string endPointUri, [FromBody]Spam spam)
+        public async Task<IActionResult> Put(string endPointUri, [FromBody]Spam spam)
         {
             var existing = repository.Spams
                 .SingleOrDefault(s => s.EndPointUri.Equals(endPointUri));
             if(existing == null){
-                Post(spam);
+                return await Post(spam);
             } else {
                 repository.Update(spam);
+                return Ok(spam);
             }
         }
 
         // DELETE api/values/5
         [HttpDelete("{endPointUri}")]
-        public void Delete(string endPointUri)
+        public async Task<IActionResult> Delete(string endPointUri)
         {
             var spam = repository.Spams
                 .Single(s => s.EndPointUri.Equals(endPointUri));
-            repository.Delete(spam);
+            await Task.FromResult(repository.Delete(spam));
+            return NoContent();
         }
     }
 }
