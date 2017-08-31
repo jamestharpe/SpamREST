@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace SpamREST.Tests
 {
-    public class SpamControllerTests
+    public class SpamsControllerTests
     {
         private static IEnumerable<Spam> SpamsList(int count){
             for(int i = 0; i < count; i++){
