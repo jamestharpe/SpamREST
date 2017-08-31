@@ -34,7 +34,7 @@ namespace SpamREST.Services
     ISpamRESTRepository ISpamRESTRepository.Update(Spam spam)
     {
       var index = storage.IndexOf(ByEndPointUri(spam.EndPointUri));
-      storage.RemoveAt(index);
+      storage[index] = spam;
       return this;
     }
   }

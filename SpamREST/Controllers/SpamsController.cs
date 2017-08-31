@@ -43,14 +43,24 @@ namespace SpamREST.Controllers
 
         // PUT api/values/5
         [HttpPut("{endPointUri}")]
-        public void Put(string endPointUri, [FromBody]string value)
+        public void Put(string endPointUri, [FromBody]Spam spam)
         {
+            var existing = repository.Spams
+                .SingleOrDefault(s => s.EndPointUri.Equals(endPointUri));
+            if(existing == null){
+                Post(spam);
+            } else {
+                repository.Update(spam);
+            }
         }
 
         // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        [HttpDelete("{endPointUri}")]
+        public void Delete(string endPointUri)
         {
+            var spam = repository.Spams
+                .Single(s => s.EndPointUri.Equals(endPointUri));
+            repository.Delete(spam);
         }
     }
 }
