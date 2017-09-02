@@ -18,23 +18,21 @@ namespace SpamREST.Services
     IQueryable<Spam> ISpamRESTRepository.Spams => 
       storage.AsQueryable();
 
-    ISpamRESTRepository ISpamRESTRepository.Add(Spam spam)
-    {
-      storage.Add(spam);
+    ISpamRESTRepository ISpamRESTRepository.Add(params Spam[] spams) {
+      foreach(var spam in spams){ storage.Add(spam); }
       return this;
     }
 
-    ISpamRESTRepository ISpamRESTRepository.Delete(Spam spam)
-    {
-      storage
-        .Remove(ByEndPointUri(spam.EndPointUri));
+    ISpamRESTRepository ISpamRESTRepository.Delete(params Spam[] spams) {
+      foreach(var spam in spams){ storage.Remove(ByEndPointUri(spam.EndPointUri)); }
       return this;
     }
 
-    ISpamRESTRepository ISpamRESTRepository.Update(Spam spam)
-    {
-      var index = storage.IndexOf(ByEndPointUri(spam.EndPointUri));
-      storage[index] = spam;
+    ISpamRESTRepository ISpamRESTRepository.Update(params Spam[] spams) {
+      foreach(var spam in spams) {
+        var index = storage.IndexOf(ByEndPointUri(spam.EndPointUri));
+         storage[index] = spam;
+      }
       return this;
     }
   }

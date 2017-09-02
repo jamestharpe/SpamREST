@@ -3,11 +3,10 @@ using SpamREST.Models;
 
 namespace SpamREST.ServiceDefinitions
 {
-  public interface ISpamRESTRepository
-  {
+  public interface ISpamRESTRepository {
     IQueryable<Spam> Spams { get; }
-    ISpamRESTRepository Add(Spam spam);
-    ISpamRESTRepository Update(Spam spam);
-    ISpamRESTRepository Delete(Spam spam);
+    ISpamRESTRepository Add(params Spam[] spams);
+    ISpamRESTRepository Update(params Spam[] spams);
+    ISpamRESTRepository Delete(params Spam[] spams);
   }
 }
