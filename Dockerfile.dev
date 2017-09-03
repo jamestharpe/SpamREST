@@ -1,0 +1,13 @@
+# Stage One: Compile & Publish
+FROM microsoft/aspnetcore-build AS builder
+WORKDIR /SpamREST
+COPY ./SpamREST/*.csproj .
+RUN dotnet restore
+COPY ./SpamREST/ .
+RUN dotnet publish --output /app/ --configuration Release
+
+# Stage Two: Run
+FROM microsoft/aspnetcore
+WORKDIR /app
+COPY --from=builder /app .
+ENTRYPOINT ["dotnet", "SpamREST.dll"]
