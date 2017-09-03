@@ -32,9 +32,10 @@ namespace SpamREST.Tests
         }
 
         public SpamsControllerTests(){
-            sut = new SpamsController(repo = new SpamRESTRepositoryMock());
+            sut = new SpamsController(
+                repo = new SpamRESTRepositoryMock());
         }
-        
+
         public void Dispose(){
             sut.Dispose();
         }
