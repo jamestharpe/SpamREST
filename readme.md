@@ -19,7 +19,7 @@ dotnet run
 docker run -it -p 5000:80 jibr/spamrest
 ```
 
-#### Building the Docker Image
+#### Building the [Docker Image](https://hub.docker.com/r/jibr/spamrest/)
 
 ```bash
 # Build it:
