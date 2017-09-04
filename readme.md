@@ -29,3 +29,17 @@ docker run -it -p 5000:80 local/spamrest
 ```
 
 Note that `Dockerfile.dev` builds the application from your local codebase to create the image.
+
+## Project TODO list
+
+### MVP Release
+
+* Issue HTTP DELETE to end-points reported >= 3 times
+* Add back-end support for Mongo
+* Add back-end support for MySQL
+
+### Later
+
+* Client app registration
+* Fetch reported end-point content via HTTP GET
+* Analyze reported content (maybe using AI?) to identify spam
