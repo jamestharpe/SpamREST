@@ -37,9 +37,14 @@ Note that `Dockerfile.dev` builds the application from your local codebase to cr
 * Issue HTTP DELETE to end-points reported >= 3 times
 * Add back-end support for Mongo
 * Add back-end support for MySQL
+* Authentication/authorization
 
 ### Later
 
 * Client app registration
 * Fetch reported end-point content via HTTP GET
 * Analyze reported content (maybe using AI?) to identify spam
+
+### Even later
+
+* Scaling/load-balancing/swarms?
