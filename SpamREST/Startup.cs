@@ -35,6 +35,7 @@ namespace SpamREST
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                // todo: Seed data
             }
 
             app.UseMvc();
