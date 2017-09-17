@@ -1,6 +1,13 @@
-# Stage One: Compile & Publish
 FROM microsoft/aspnetcore-build
-# RUN echo "hello world" | tee greeting.txt
+# Debugging Support
+RUN apt-get update && apt-get install -y unzip
+WORKDIR /clrdbg
+RUN curl -SL https://raw.githubusercontent.com/Microsoft/MIEngine/getclrdbg-release/scripts/GetClrDbg.sh \
+      --output GetClrDbg.sh \
+    && chmod 700 GetClrDbg.sh \
+    && ./GetClrDbg.sh -v latest -l . \
+    && rm GetClrDbg.sh 
+# Build & Run Support
 VOLUME /SpamREST
 WORKDIR /SpamREST
 EXPOSE 80/tcp

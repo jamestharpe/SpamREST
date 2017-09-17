@@ -14,6 +14,13 @@ namespace SpamREST.Controllers
 
         public SpamsController(ISpamRESTRepository repository) {
             this.repository = repository;
+            repository.Add(new Spam(){
+                Content = "Spam I am",
+                Created = DateTime.UtcNow,
+                EndPointUri = "http://localhost/",
+                ReporteeId = "spammer",
+                ReporterId = "unspammer"
+            });
         }
 
         [HttpGet]
