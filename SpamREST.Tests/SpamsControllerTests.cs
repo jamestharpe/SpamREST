@@ -46,7 +46,7 @@ namespace SpamREST.Tests
             repo.Add(SpamsList(2).ToArray());
             var response = Assert.IsType<OkObjectResult>(await sut.Get());
             var actual = Assert.IsType<EnumerableQuery<Spam>>(response.Value);
-            Assert.Equal(actual.Count(), 2);
+            Assert.Equal(2, actual.Count());
         }
 
         [Fact]

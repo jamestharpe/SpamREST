@@ -7,6 +7,7 @@ RUN curl -SL https://raw.githubusercontent.com/Microsoft/MIEngine/getclrdbg-rele
     && chmod 700 GetClrDbg.sh \
     && ./GetClrDbg.sh -v latest -l . \
     && rm GetClrDbg.sh 
+    
 # Build & Run Support
 VOLUME /SpamREST
 WORKDIR /SpamREST
